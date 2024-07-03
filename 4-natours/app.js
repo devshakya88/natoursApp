@@ -1,14 +1,17 @@
-const fs = require('fs');
 const express = require('express');
 const morgan = require('morgan');
 const tourRoutes = require('./routes/tourRoutes');
 const userRoutes = require('./routes/usersRoutes');
 
 const app = express();
+console.log(process.env.NODE_ENV);
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
-//1. MiddleWare
-app.use(morgan('dev'));
 app.use(express.json());
+
+app.use(express.static(`${__dirname}/public`));
 
 app.use((req, res, next) => {
   console.log('Hello from the Middleware👋👋');
@@ -20,11 +23,8 @@ app.use((req, res, next) => {
   next();
 });
 
+//Routes
 app.use('/api/v1/tours', tourRoutes);
 app.use('/api/v1/users', userRoutes);
 
-//Start Server
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`App Running on port ${PORT}...`);
-});
+module.exports = app;
