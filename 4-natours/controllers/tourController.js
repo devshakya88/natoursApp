@@ -1,27 +1,35 @@
 const Tour = require('./../models/tourModel');
 
-//Get All Tours
-
+// Get All Tours
 exports.getAllTours = async (req, res) => {
   try {
-    //BUILD QUERY
+    // BUILD QUERY
+    // 1(a). Filtering
     const queryObj = { ...req.query };
+    console.log(req.query);
     const excludeFields = ['page', 'sort', 'limit', 'fields'];
     excludeFields.forEach((el) => delete queryObj[el]);
 
-    const query = Tour.find(queryObj);
+    // 2(b). Advanced Filtering
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(
+      /\b(gte|gt|lte|lt)\b/g, // Removed spaces
+      (match) => `$${match}`,
+    );
 
-    // const tours = await Tour.find(req.queryObj);
-    // res.status(200).json({
-    //   status: 'success',
-    //   results: tours.length,
-    //   data: {
-    //     tours,
-    //   },
-    // });
+    let query = Tour.find(JSON.parse(queryStr));
 
+    //2. Sorting
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join('');
+      query = query.sort(req.query.sort);
+    } else {
+      query = query.sort('-createdAt');
+    }
+
+    // Execute Query
     const tours = await query;
-    //Send Response
+    // Send Response
     res.status(200).json({
       status: 'success',
       results: tours.length,
@@ -38,8 +46,7 @@ exports.getAllTours = async (req, res) => {
   }
 };
 
-//Get Tour by ID
-
+// Get Tour by ID
 exports.getTour = async (req, res) => {
   try {
     const tour = await Tour.findById(req.params.id);
@@ -58,8 +65,7 @@ exports.getTour = async (req, res) => {
   }
 };
 
-//Create New Tour Data
-
+// Create New Tour Data
 exports.createTour = async (req, res) => {
   try {
     const newTour = await Tour.create(req.body);
@@ -80,6 +86,7 @@ exports.createTour = async (req, res) => {
   }
 };
 
+// Update Tour
 exports.updateTour = async (req, res) => {
   try {
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
@@ -102,19 +109,18 @@ exports.updateTour = async (req, res) => {
   }
 };
 
+// Delete Tour
 exports.deleteTour = async (req, res) => {
   try {
-    const tour = await Tour.findByIdAndDelete(req.params.id);
-
+    await Tour.findByIdAndDelete(req.params.id);
     res.status(204).json({
       status: 'success',
+      data: null,
     });
   } catch (err) {
     res.status(400).json({
       status: 'failed',
-      data: {
-        message: err,
-      },
+      message: err,
     });
   }
 };
