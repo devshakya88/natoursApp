@@ -52,12 +52,12 @@ userSchema.pre('save', async function (next) {
 
   // Delete passwordConfirm field
   this.passwordConfirm = undefined;
+  next();
+});
 
-  // Set passwordChangedAt to the current time
-  if (!this.isNew) {
-    this.passwordChangedAt = Date.now() - 1000; // Subtract 1 second to ensure token is created after password has been changed
-  }
-
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+  this.passwordChangedAt = Date.now() - 1000;
   next();
 });
 
