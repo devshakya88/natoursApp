@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
   photo: String,
   role: {
     type: String,
-    enum: ['user', 'guide', 'lead-guide', 'admin'],
+    enum: ['admin', 'user', 'lead-guide', 'guide'],
     default: 'user',
   },
   password: {
@@ -41,6 +41,11 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 userSchema.pre('save', async function (next) {
@@ -50,14 +55,23 @@ userSchema.pre('save', async function (next) {
   // Hash the password with cost of 12
   this.password = await bcrypt.hash(this.password, 12);
 
+  // Debugging: Log password and passwordConfirm before deleting
+  console.log('Password:', this.password);
+  console.log('Password Confirm:', this.passwordConfirm);
+
   // Delete passwordConfirm field
   this.passwordConfirm = undefined;
+  next();
+});
 
-  // Set passwordChangedAt to the current time
-  if (!this.isNew) {
-    this.passwordChangedAt = Date.now() - 1000; // Subtract 1 second to ensure token is created after password has been changed
-  }
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
 
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
   next();
 });
 
