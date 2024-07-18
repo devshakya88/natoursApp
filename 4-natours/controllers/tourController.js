@@ -1,7 +1,5 @@
 const Tour = require('./../models/tourModel');
-const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
-const AppError = require('./../utils/appError');
 const factory = require('./../controllers/handlerFactory');
 
 exports.aliasTopTours = (req, res, next) => {
@@ -12,42 +10,9 @@ exports.aliasTopTours = (req, res, next) => {
 };
 
 // Get All Tours
-exports.getAllTours = async (req, res, next) => {
-  // Execute Query
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .pagination();
-  const tours = await features.query;
-
-  // Send Response
-  res.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: {
-      tours,
-    },
-  });
-};
-
-//test
+exports.getAllTours = factory.getAll(Tour);
 // Get Tour by ID
-exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id).populate('reviews');
-
-  if (!tour) {
-    return next(new AppError('No Tour found with that ID', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour,
-    },
-  });
-});
-
+exports.getTour = factory.getOne(Tour, { path: 'reviews' });
 // Create New Tour Data
 exports.createTour = factory.createOne(Tour);
 // Update Tour

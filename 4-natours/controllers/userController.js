@@ -12,18 +12,6 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-exports.getAllUsers = catchAsync(async (req, res) => {
-  const users = await User.find();
-
-  res.status(200).json({
-    status: 'success',
-    result: users.length,
-    data: {
-      users,
-    },
-  });
-});
-
 exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm) {
     return next(
@@ -56,21 +44,9 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 exports.createUsers = (req, res) => {
   res.status(500).json({
     status: 'error',
-    message: 'This Route is not yet defined!',
+    message: 'This Route is not yet defined! please use signup instead',
   });
 };
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This Route is not yet defined!',
-  });
-};
-
-//Do Not Update Password with this
-exports.updateUser = factory.updateOne(User);
-
-//Delete user
-exports.deleteUser = factory.deleteOne(User);
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
@@ -80,3 +56,12 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+//Get All User
+exports.getAllUsers = factory.getAll(User);
+//Get User by Id
+exports.getUser = factory.getOne(User);
+//Do Not Update Password with this
+exports.updateUser = factory.updateOne(User);
+//Delete user
+exports.deleteUser = factory.deleteOne(User);
