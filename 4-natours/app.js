@@ -11,6 +11,7 @@ const userRouter = require('./routes/usersRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 
 const app = express();
+app.set('view engine', 'pug');
 
 //Global Middleware
 
