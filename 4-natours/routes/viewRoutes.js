@@ -1,23 +1,9 @@
 const express = require('express');
+const viewController = require('./../controllers/viewController');
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  res.status(200).render('base', {
-    tour: 'The Forest Hiker',
-    user: 'Jonas',
-  });
-});
-
-router.get('/overview', (req, res) => {
-  res.status(200).render('overview', {
-    title: 'All Tours',
-  });
-});
-
-router.get('/overview', (req, res) => {
-  res.status(200).render('tour', {
-    title: 'The Forest Hiker Tour',
-  });
-});
+router.get('/', viewController.getOverview); // Add this line
+router.get('/overview', viewController.getOverview);
+router.get('/tour', viewController.getTour);
 
 module.exports = router;
