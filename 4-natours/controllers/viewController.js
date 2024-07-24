@@ -25,5 +25,3 @@ exports.getTour = catchAsync(async (req, res) => {
     tour,
   });
 });
-
-//Some change in ViewControlller

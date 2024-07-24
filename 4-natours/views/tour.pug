@@ -33,9 +33,9 @@ block content
           h2.heading-secondary.ma-bt-lg Quick facts
 
           +overviewBox('Next date', tour.startDates[0].toLocaleString('en-US', { month: 'long', year: 'numeric' }), 'calendar')
-          +overviewBox('Difficulty', date, 'trending-up')
-          +overviewBox('Participants', '10 people', 'user')
-          +overviewBox('Rating', '4.9 / 5', 'star')
+          +overviewBox('Difficulty',tour.difficulty, 'trending-up')
+          +overviewBox('Participants', `${tour.maxGroupSize}` , 'user')
+          +overviewBox('Rating', `${tour.ratingsAverage}/5` , 'star')
 
         .overview-box__group
           h2.heading-secondary.ma-bt-lg Your tour guides
