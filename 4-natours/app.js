@@ -24,11 +24,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 //set security HTTP header
 app.use(helmet());
 
-//Developemt  loggin
+//Developemt loggin
 console.log(process.env.NODE_ENV);
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
 //limit request
 const limiter = rateLimit({
   max: 100,
@@ -38,13 +39,13 @@ const limiter = rateLimit({
 
 app.use('/api', limiter);
 
-//Body Pareser, readinf data from body into req.body
+//Body Parser, reading data from body into req.body
 app.use(express.json({ limit: '100kb' }));
 
 //Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
-//Data sanitization agains XSS
+//Data sanitization against XSS
 app.use(xss());
 
 //Test middleware
@@ -52,9 +53,8 @@ app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
 });
-///New Comment
-// Routes
 
+// Routes
 app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
