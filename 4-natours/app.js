@@ -1,12 +1,12 @@
 const path = require('path');
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
-const cookieParser = require('cookie-parser');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
@@ -59,11 +59,29 @@ app.use(mongoSanitize());
 app.use(xss());
 
 // Enable CORS for all routes
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+const corsOptions = {
+  origin: 'http://localhost:3000', // Replace with your frontend's URL
+  credentials: true, // Allow credentials (cookies)
+};
+
+app.use(cors(corsOptions));
+
+// Set CORS headers
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Origin', 'http://localhost:3000'); // Replace with your frontend's URL
+  res.header('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+  );
+  next();
+});
 
 // Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
+  console.log('Request Cookies:', req.cookies); // Log request cookies
   next();
 });
 

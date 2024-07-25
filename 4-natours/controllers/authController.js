@@ -14,17 +14,16 @@ const signToken = (id) => {
 
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
-
   const cookieOptions = {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
     ),
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // Ensure this is true in production
-    sameSite: 'Lax', // or 'Strict' / 'None'
+    sameSite: 'None', // Ensure SameSite is None for cross-site cookies
+    secure: process.env.NODE_ENV === 'production', // Only set secure flag in production
   };
-
   res.cookie('jwt', token, cookieOptions);
+  console.log('Set-Cookie:', res.getHeaders()['set-cookie']); // Log the Set-Cookie header
   user.password = undefined;
   res.status(statusCode).json({
     status: 'success',
