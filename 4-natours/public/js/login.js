@@ -8,18 +8,27 @@ const login = async (email, password) => {
         email,
         password,
       },
+      withCredentials: true, // Include cookies in the request
     });
     console.log(res.data);
+    if (res.data.status === 'success') {
+      window.setTimeout(() => {
+        location.assign('/');
+      }, 1500);
+    }
   } catch (err) {
     console.log(err);
   }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelector('.form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    login(email, password);
-  });
+  const loginForm = document.querySelector('.form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      login(email, password);
+    });
+  }
 });
